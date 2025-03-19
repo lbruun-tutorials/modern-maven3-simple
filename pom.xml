@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd"
+         child.project.url.inherit.append.path="false">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>net.lbruun.examples.serendipity</groupId>
+  <artifactId>core</artifactId>
+  <version>${revision}</version> <!-- never change this -->
+  <packaging>jar</packaging>
+  <name>ModernMaven3 :: Single-module Example - Serendipity</name>
+  <description>Example of how to publish a single-module Java project to Maven Central using GitHub and Maven.</description>
+
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+
+    <!-- Some sensible defaults for local development.
+         These values are only used when executing Maven locally. -->
+    <revision>LATEST-SNAPSHOT</revision>
+    <ci.project.url>https://UNKNOWN.ORG</ci.project.url> <!-- placeholder: set dynamically by the CI system -->
+    <ci.scm.tag>HEAD</ci.scm.tag> <!-- placeholder: set dynamically by the CI system -->
+  </properties>
+
+
+  <url>${ci.project.url}</url>
+  <organization>
+    <name>lbruun.net</name>
+  </organization>
+
+  <licenses>
+    <license>
+      <name>The Apache License, Version 2.0</name>
+      <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+    </license>
+  </licenses>
+
+  <developers>
+    <developer>
+      <name>Lars Bruun-Hansen</name>
+      <organization>lbruun.net</organization>
+      <organizationUrl>https://github.com/lbruun</organizationUrl>
+    </developer>
+  </developers>
+
+
+  <!-- This section is not used in the deploy/release process (since we do not use the
+       Maven Release Plugin), but is mandatory for publishing to Maven Central. -->
+  <scm>
+    <tag>${ci.scm.tag}</tag>
+    <url>${ci.project.url}/tree/${project.scm.tag}</url>
+  </scm>
+
+
+
+  <build>
+    <pluginManagement>
+      <plugins>
+
+        <!-- The 'templating-maven-plugin' is used to create the LibraryInfo class
+             with static information about the library, accessible at runtime.
+             You can remove this if you don't need such feature.                       -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>templating-maven-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>templating-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>filter-sources</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+
+  <profiles>
+    <profile>
+      <!-- This profile should be activated when building in the CI system -->
+      <id>ci</id>
+      <activation>
+        <property>
+          <!-- Many CI systems, e.g. GitHub, GitLab, Travis, etc, set this variable -->
+          <name>env.CI</name>
+          <value>true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <!--  Javadoc here because we want to know early if there are errors in Javadoc generation.
+                In the standard Sonatype guidelines it is inside the 'release-to-central' profile
+                which means we will not discover Javadoc errors until we decide to release.
+                Instead, we pay the price of Javadoc generation on every push: an acceptable tradeoff.
+          -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.6.2</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+
+          <!-- Get info from Git. The only reason for this is the LibraryInfo class. -->
+          <plugin>
+            <groupId>io.github.git-commit-id</groupId>
+            <artifactId>git-commit-id-maven-plugin</artifactId>
+            <version>9.0.1</version>
+            <executions>
+              <execution>
+                <id>get-the-git-infos</id>
+                <goals>
+                  <goal>revision</goal>
+                </goals>
+                <phase>initialize</phase>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+
+    <!-- This profile should be activated when creating releases into Maven Central
+         (regardless if regular release or snapshot release). -->
+    <profile>
+      <id>publish</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>3.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.7</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <configuration>
+                  <signer>bc</signer> <!-- use Bouncy Castle -->
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+
+          <plugin>
+            <groupId>org.sonatype.plugins</groupId>
+            <artifactId>nexus-staging-maven-plugin</artifactId>
+            <version>1.7.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <serverId>maven-central</serverId>
+
+              <!--
+                Projects which has registered with Sonatype/MavenCentral after February 2021 use
+                "s01.oss.sonatype.org" as the hostname in the URL below. Change accordingly.
+              -->
+              <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+
+              <!-- Flip this if you feel confident about your build -->
+              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+</project>

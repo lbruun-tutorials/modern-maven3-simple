@@ -43,8 +43,8 @@ If it is something not related to the committed code, for example transient netw
 If it is something related to the commited code then it is likely that you did _not_ release from a state
 where the `main` branch was passing the pipeline without failure. However, if it really happens then: 
 
-1. Delete the failed release from [Releases](/releases)  (this will not delete the git tag).
-2. Delete the tag from [Tags](/tags).
+1. Delete the failed release from [Releases](/../../releases)  (this will not delete the git tag).
+2. Delete the tag from [Tags](/../../tags).
 3. Correct the problem with a new commit and push (but this time you _await_ the CI pipeline for that push and check
 if it passes!).
 4. Create a new release with the same tag as before.

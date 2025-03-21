@@ -21,7 +21,7 @@ and all releases are done from that branch.
 
 When the project is ready to have a new release published:
 
-1. Make sure the `main` branch builds and tests without errors. Look in [Actions](/actions) for any failed recent executions.
+1. Make sure the `main` branch builds and tests without errors. Look in [Actions](actions) for any failed recent executions.
 (in the ideal world this requirement is true; the project's `main` branch should always be kept in a 'releasable' state)
 2. Go to the GitHub UI and press "Releases". Choose a tag which complies with [SemVer](https://semver.org/)
 and press "Publish release". That is all!

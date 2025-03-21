@@ -16,13 +16,14 @@
     <maven.compiler.target>11</maven.compiler.target>
     <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <buildTime>${maven.build.timestamp}</buildTime> <!-- allow 'maven.build.timestamp' to be available for property substitution -->
 
 
     <!-- Some sensible defaults for local development.
          These values are only used when executing Maven locally. -->
     <revision>LATEST-SNAPSHOT</revision>
     <ci.project.url>https://UNKNOWN.ORG</ci.project.url> <!-- placeholder: set dynamically by the CI system -->
-    <ci.scm.tag>HEAD</ci.scm.tag> <!-- placeholder: set dynamically by the CI system -->
+    <ci.scm.tag>HEAD</ci.scm.tag>                        <!-- placeholder: set dynamically by the CI system -->
   </properties>
 
 
@@ -54,6 +55,13 @@
     <url>${ci.project.url}/tree/${project.scm.tag}</url>
   </scm>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>2.0.17</version>
+    </dependency>
+  </dependencies>
 
 
   <build>
@@ -143,7 +151,7 @@
     <!-- This profile should be activated when creating releases into Maven Central
          (regardless if regular release or snapshot release). -->
     <profile>
-      <id>publish</id>
+      <id>publication</id>
       <build>
         <plugins>
           <plugin>

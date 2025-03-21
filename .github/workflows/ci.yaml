@@ -28,6 +28,24 @@ jobs:
           server-username: 'MAVEN_CENTRAL_USERNAME' # env variable name for username in <server> section of generated settings.xml
           server-password: 'MAVEN_CENTRAL_PASSWORD' # env variable name for password in <server> section of generated settings.xml
 
+
+        # Check if the git tag complies with SemVer rules
+      - name: Check version string
+        if:  ${{ github.event_name == 'release' }}
+        run: |
+          semver_regex='^v?([0-9]+\.[0-9]+\.[0-9]+(\-[0-9a-zA-Z.]+)*)$'
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            # Does tag look like a SemVer string?
+            if [[ "$GITHUB_REF_NAME" =~ $semver_regex ]]; then
+              echo "Verified: Git tag \"${GITHUB_REF_NAME#v}\" is a valid semantic versioning string."
+            else
+              echo "ERROR: Git tag \"${GITHUB_REF_NAME#v}\" is not a valid semantic versioning string."
+              echo "       Cannot create release !"
+              exit 1
+            fi
+          fi
+  
+
       - name: Maven execution
         run: |
           ./mvnw \
@@ -41,7 +59,7 @@ jobs:
               $MVN_PHASE
         env:
           MVN_PHASE: ${{ github.event_name == 'release' && 'deploy' || 'verify' }}
-          MVN_PROFILES: ${{ github.event_name == 'release' && '"publish"' || '""' }}
+          MVN_PROFILES: ${{ github.event_name == 'release' && '"publication"' || '""' }}
           # The following 2 env vars are used by the Maven GPG Plugin
           MAVEN_GPG_KEY: ${{ secrets.MAVEN_CENTRAL_GPG_SECRET_KEY }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_CENTRAL_GPG_PASSPHRASE }}

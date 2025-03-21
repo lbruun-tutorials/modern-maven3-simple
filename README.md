@@ -367,18 +367,35 @@ simply need to make such environment variables available to the "mvn deploy" exe
 
 ## Releasing
 
-When the project is ready to have a new release, simply go to the GitHub UI and press "Releases". Choose a tag which
-complies with [SemVer](https://semver.org/) and press "Publish release". That is all!
+When the project is ready to have a new release published:
 
-If you add a so-called prerelease suffix (in SemVer terminology this means adding a dash+something after the `X.Y.Z`,
-for example `3.9.0-RC1`) then the pipeline will assume you mean a Maven snapshot release and publish to snapshot repository.
+1. Make sure the `main` branch builds and tests without errors. Look in [Actions](./actions] for any failed recent executions.
+(in the ideal world this requirement is true; the project's `main` branch should always be kept in a 'releasable' state)
+2. Go to the GitHub UI and press "Releases". Choose a tag which complies with [SemVer](https://semver.org/)
+and press "Publish release". That is all!
 
 You can optionally put a `v` in front of your tags as in `v1.4.8`. It won't become part of the Maven version string. 
 Whether you use the `v` or not is up to you. Just be consistent.
 
-Note: Be careful with choosing a tag. Once something is published to Maven Central is can never be retracted. Also, while Git allows
-you to delete a tag, the GitHub UI deliberately has no such feature. They've made it hard for you to do such operation .. and
-indeed it should be hard!
+Note: Be careful with choosing a tag. Once something is published to Maven Central is can never be retracted. 
+
+### What if the release execution fails?
+
+It depends:
+
+If it is something not related to the committed code, for example networking issue or a missing or incorrect GitHub Secret
+
+1. Correct the problem if needed
+2. Re-run the job  (find the failed workflow execution in the GitHub UI and press the "Re-run all jobs" button)
+
+If it is something related to the commited code then it likely that you did _not_ start out from a state
+where the `main` branch was passing the pipeline without failure. However, if it really happens then: 
+
+1. Delete the failed release from [Releases](./releases)  (this will not delete the git tag)
+2. Delete the tag from [Tags](./tags)
+3. Correct the problem with a new commit and push (but this time you AWAIT the CI pipeline for that push and check
+if it passes!)
+4. Create a new release with the same tag as before
 
 
 ## How do I know if my flow works? (without publishing)

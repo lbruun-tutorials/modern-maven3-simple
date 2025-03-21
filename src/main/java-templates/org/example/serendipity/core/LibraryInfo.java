@@ -94,7 +94,7 @@ public class LibraryInfo {
      * Returns empty string if unknown or no license, never {@code null}.
      * @see #licenseName
      */
-    public static String licenseUrl = fixUnresolved("${project.licenses[0].url");
+    public static String licenseUrl = fixUnresolved("${project.licenses[0].url}");
 
 
     /**

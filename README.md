@@ -39,7 +39,7 @@ Note: Be careful with choosing a tag. Once something is published to Maven Centr
 
 ### What if the release execution fails?
 
-It depends:
+It depends on the cause:
 
 If it is something not related to the committed code, for example transient networking issue or a missing or incorrect GitHub Secret:
 

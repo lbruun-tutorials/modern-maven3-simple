@@ -39,7 +39,7 @@ jobs:
             if [[ "$GITHUB_REF_NAME" =~ $semver_regex ]]; then
               echo "Verified: Git tag \"${GITHUB_REF_NAME#v}\" is a valid semantic versioning string."
             else
-              echo "ERROR: Git tag \"${GITHUB_REF_NAME#v}\" is not a valid semantic versioning string."
+              echo "ERROR: Git tag \"${GITHUB_REF_NAME}\" is not a valid semantic versioning string."
               echo "       Cannot create release !"
               exit 1
             fi

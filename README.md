@@ -1,15 +1,21 @@
-# Example project: library suite which gets published to Maven Central
+# Modern Maven: library which gets published to Maven Central
 
 Example of a library suite.
 
 It serves as an opinionated best practice for how to structure such a use-case, 
 in particular with focus on Maven.
 
-The example presented here is a pretend library suite named _serendipity_ which
-has a number of modules as well as a BOM. You can use it as a template for your
-own library suite.
+The example presented here is a pretend library named _serendipity_.
+You can use it as a template for your own library suite.
 
-
+- Uses Maven [CI Friendly versioning](https://maven.apache.org/guides/mini/guide-maven-ci-friendly.html) 
+in order to make the release process as simple and transparent as possible.
+- Uses Maven Wrapper
+- Uses BouncyCastle for signing as opposed to GnuPG. Much simpler.
+- All URLs related to the project's "home" are variables and are supplied by the CI platform.
+- Javadocs are build for every execution in CI system as opposed to only when in "release" event.
+This is because we want to know early if there is a Javadoc error.
+- There is a single `mvn` invocation.
 
 ## Development model
 

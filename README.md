@@ -44,7 +44,7 @@ It depends:
 If it is something not related to the committed code, for example transient networking issue or a missing or incorrect GitHub Secret:
 
 1. Correct the problem (unless it is transient).
-2. Re-run the job  (find the failed workflow execution in the GitHub UI and press the "Re-run all jobs" button)
+2. Re-run the job: find the failed workflow execution in the GitHub UI and press the "Re-run all jobs" button.
 
 If it is something related to the commited code then it is likely that you did _not_ release from a state
 where the `main` branch was passing the pipeline without failure. However, if it really happens then: 
